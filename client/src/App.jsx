@@ -5,6 +5,7 @@ import ReactLoading from "react-loading";
 const App = () => {
   const [input, setInput] = useState("");
   const [zillowEstimate, setZillowEstimate] = useState("");
+  const [realtorEstimate, setRealtorEstimate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -22,9 +23,10 @@ const App = () => {
         },
         body: JSON.stringify({ input }),
       });
-      const rentEstimate = await response.json();
+      const rentalEstimates = await response.json();
       // const data = await response.json();
-      setZillowEstimate(rentEstimate.rentEstimate);
+      setZillowEstimate(rentalEstimates.zillowEstimate);
+      setRealtorEstimate(rentalEstimates.realtorEstimate);
       setIsLoading(false);  
       console.log("Rent estimate:", rentEstimate.rentEstimate);
     } catch (error) {
@@ -68,13 +70,13 @@ const App = () => {
           <div className="bg-red-300 mb-8 rounded-lg h-1/4 p-2   ">
             <h2 className="text-xl">Redfin's Rent Estimate: </h2>
             <div className="text-3xl w-1/2 h-1/2 m-auto mt-6  text-center">
-              {zillowEstimate}
+              {realtorEstimate}
             </div>
           </div>
           <div className="bg-red-300 mb-8 rounded-lg h-1/4 p-2   ">
             <h2 className="text-xl">Realtor's Rent Estimate: </h2>
             <div className="text-3xl w-1/2 h-1/2 m-auto mt-6  text-center">
-              {zillowEstimate}
+              {realtorEstimate}
             </div>
           </div>
         </section>

@@ -28,7 +28,11 @@ app.post("/api/search", async (req, res) => {
     res.status(500).json({ error: "Error during scraping" });
   }
 });
+
+// Define the URL to scrape
 const url1 = "https://www.zillow.com/";
+const url2 = "https://www.realtor.com/";
+
 const zillow = async (address) => {
   // Launch the browser and open a new blank page
   const browser = await puppeteer.launch({
@@ -38,6 +42,7 @@ const zillow = async (address) => {
   const page = await browser.newPage();
 
   // Navigate the page to a URL
+  const url1 = 'https://www.zillow.com'; // Replace with the actual Zillow URL
   await page.goto(url1);
 
   // Set screen size
@@ -45,34 +50,50 @@ const zillow = async (address) => {
 
   // Type into search box
   console.log("address", address);
-  await page.type("input", address);
+  await page.type("input", address); // Adjust selector based on actual input field
   console.log("Searching for address...");
   
   const [response] = await Promise.all([
-    // page.waitForSelector("[type=submit]"),
     page.waitForNavigation(),
     page.keyboard.press("Enter"),
-    // page.click("[type=submit]"),
   ]);
-  // await page.waitForSelector('h1');
 
-  const rentEstimate = await page.evaluate(() => {
+  const zillowEstimate = await page.evaluate(() => {
     const elements = document.querySelectorAll(
       ".Text-c11n-8-99-3__sc-aiai24-0.dFhjAe"
     );
 
-    // Check if there is at least a second occurrence
     if (elements.length >= 2) {
-      // Access the second element and extract its text content
-      const secondElement = elements[1]; // Index 1 for the second occurrence
+      const secondElement = elements[1];
       return secondElement.firstChild.textContent.trim();
     } else {
       return "Second occurrence not found";
     }
   });
- 
-  console.log("Zillow's rent estimate is ", rentEstimate);
-  await browser.close();
-  return rentEstimate;
 
+  console.log("Zillow's rent estimate is ", zillowEstimate);
+
+  const realtorEstimate = await realtor(address, browser);
+
+  await browser.close();
+  return { zillowEstimate, realtorEstimate };
+};
+
+const realtor = async (address, browser) => {
+  const page = await browser.newPage();
+  const url2 = 'https://www.realtor.com'; // Replace with the actual Realtor URL
+  await page.goto(url2);
+  
+  await page.type("input", address); // Adjust selector based on actual input field
+  await page.keyboard.press("Enter");
+
+  await page.waitForNavigation(); // Ensure the page has loaded
+
+  const realtorEstimate = await page.evaluate(() => {
+    const selector = '[data-testid="rental-headline-text"]';
+    const element = document.querySelector(selector);
+    return element ? element.textContent.trim() : "Estimate not found";
+  });
+
+  return realtorEstimate;
 };
