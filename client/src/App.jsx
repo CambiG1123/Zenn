@@ -24,11 +24,13 @@ const App = () => {
         body: JSON.stringify({ input }),
       });
       const rentalEstimates = await response.json();
+      console.log("Rental Estimates:", rentalEstimates);
       // const data = await response.json();
-      setZillowEstimate(rentalEstimates.zillowEstimate);
-      setRealtorEstimate(rentalEstimates.realtorEstimate);
+      setZillowEstimate(rentalEstimates.rentEstimate.zillowEstimate);
+      
+      setRealtorEstimate(rentalEstimates.rentEstimate.realtorEstimate);
       setIsLoading(false);  
-      console.log("Rent estimate:", rentEstimate.rentEstimate);
+      console.log("Rent estimate:", rentalEstimates.zillowEstimate);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -70,7 +72,7 @@ const App = () => {
           <div className="bg-red-300 mb-8 rounded-lg h-1/4 p-2   ">
             <h2 className="text-xl">Redfin's Rent Estimate: </h2>
             <div className="text-3xl w-1/2 h-1/2 m-auto mt-6  text-center">
-              {realtorEstimate}
+              
             </div>
           </div>
           <div className="bg-red-300 mb-8 rounded-lg h-1/4 p-2   ">
